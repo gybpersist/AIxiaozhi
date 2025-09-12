@@ -1,0 +1,13 @@
+# Target labels
+ bootloader
+# Source files and their labels
+E:/project_ruanjian/AAA_Workspace/AAA_ESP32_project/AIxiaozhi/build/CMakeFiles/bootloader
+E:/project_ruanjian/AAA_Workspace/AAA_ESP32_project/AIxiaozhi/build/CMakeFiles/bootloader.rule
+E:/project_ruanjian/AAA_Workspace/AAA_ESP32_project/AIxiaozhi/build/CMakeFiles/bootloader-complete.rule
+E:/project_ruanjian/AAA_Workspace/AAA_ESP32_project/AIxiaozhi/build/bootloader-prefix/src/bootloader-stamp/bootloader-build.rule
+E:/project_ruanjian/AAA_Workspace/AAA_ESP32_project/AIxiaozhi/build/bootloader-prefix/src/bootloader-stamp/bootloader-configure.rule
+E:/project_ruanjian/AAA_Workspace/AAA_ESP32_project/AIxiaozhi/build/bootloader-prefix/src/bootloader-stamp/bootloader-download.rule
+E:/project_ruanjian/AAA_Workspace/AAA_ESP32_project/AIxiaozhi/build/bootloader-prefix/src/bootloader-stamp/bootloader-install.rule
+E:/project_ruanjian/AAA_Workspace/AAA_ESP32_project/AIxiaozhi/build/bootloader-prefix/src/bootloader-stamp/bootloader-mkdir.rule
+E:/project_ruanjian/AAA_Workspace/AAA_ESP32_project/AIxiaozhi/build/bootloader-prefix/src/bootloader-stamp/bootloader-patch.rule
+E:/project_ruanjian/AAA_Workspace/AAA_ESP32_project/AIxiaozhi/build/bootloader-prefix/src/bootloader-stamp/bootloader-update.rule

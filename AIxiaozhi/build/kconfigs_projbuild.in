@@ -1,0 +1,6 @@
+source "E:/project_ruanjian/Espressif/frameworks/esp-idf-v5.3.1/components/bootloader/Kconfig.projbuild"
+source "E:/project_ruanjian/Espressif/frameworks/esp-idf-v5.3.1/components/esp_app_format/Kconfig.projbuild"
+source "E:/project_ruanjian/Espressif/frameworks/esp-idf-v5.3.1/components/esp_rom/Kconfig.projbuild"
+source "E:/project_ruanjian/Espressif/frameworks/esp-idf-v5.3.1/components/esptool_py/Kconfig.projbuild"
+source "E:/project_ruanjian/Espressif/frameworks/esp-idf-v5.3.1/components/partition_table/Kconfig.projbuild"
+source "E:/project_ruanjian/AAA_Workspace/AAA_ESP32_project/AIxiaozhi/managed_components/espressif__esp-sr/Kconfig.projbuild"
