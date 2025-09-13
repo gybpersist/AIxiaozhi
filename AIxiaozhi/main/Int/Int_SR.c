@@ -179,13 +179,13 @@ static void audio_sr_fetch_task(void *args)
         if (vad_state == VAD_SPEECH && audio_sr->is_wakeup == true && Com_Status == Com_Status_LISTENING)
         {
             // 取出音频数据
-            int16_t *processed_audio = result->raw_data;
+            int16_t *data = result->raw_data;
 
             // 将数据写入环形缓冲区
-            xRingbufferSend(audio_sr->ringbufferhandle, processed_audio, feed_size, portMAX_DELAY);
+            xRingbufferSend(audio_sr->ringbufferhandle, data, feed_size, portMAX_DELAY);
         }
 
-        vTaskDelay(10);
+        // vTaskDelay(10);
     }
 }
 

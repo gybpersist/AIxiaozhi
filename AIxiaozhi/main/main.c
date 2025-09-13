@@ -25,6 +25,10 @@ static void app_main_wakenet_cb(void *args)
         Dri_websocket_Start();
         // 发送 hello 消息
         Dri_websocket_SendHello();
+        // 发送需要AI控制的外设
+        Dri_websocket_Send_iot_dev();
+        // 发送需要AI控制的外设当前的状态
+        Dri_websocket_Send_iot_dev_status();
     } // 小智在Com_Status_SPEAKERING状态就进行打断
     else if (Com_Status == Com_Status_SPEAKERING)
     {
@@ -88,8 +92,10 @@ static void app_main_ws_text_cb(const char *data, int len)
 
         // 提取session_id
         cJSON *s_id = cJSON_GetObjectItem(root, "session_id");
+
         char *s_id_str = cJSON_GetStringValue(s_id);
         memcpy(session_id, s_id_str, strlen(s_id_str));
+        MY_LOGE("session_id:%s", session_id);
 
         // 接收到HELLO消息的事件标志
         xEventGroupSetBits(ws_eventgroup, WS_HELLO_EVENT);
@@ -97,6 +103,49 @@ static void app_main_ws_text_cb(const char *data, int len)
     else if (strcmp(type_str, "stt") == 0)
     {
         MY_LOGE("receive Speech-to-Text data : %.*s", len, data);
+    } // 接收到 iot 信息
+    else if (strcmp(type_str, "iot") == 0)
+    {
+        MY_LOGE("receive iot data : %.*s", len, data);
+
+        // 提取 commands
+        cJSON *commands = cJSON_GetObjectItem(root, "commands");
+        int commands_size = cJSON_GetArraySize(commands);
+        for (int i = 0; i < commands_size; i++)
+        {
+            cJSON *method_json = cJSON_GetArrayItem(commands, i);
+
+            // 提取 method
+            cJSON *method = cJSON_GetObjectItem(method_json, "method");
+            char *method_str = cJSON_GetStringValue(method);
+
+            if (strcmp(method_str, "SetVolume") == 0)
+            {
+                // 提取 parameters 的 volume参数
+                cJSON *parameters = cJSON_GetObjectItem(method_json, "parameters");
+                cJSON *volume = cJSON_GetObjectItem(parameters, "volume");
+                double volume_num = cJSON_GetNumberValue(volume);
+
+                // 设置音量大小
+                Int_ES8311_SetVolume((int)volume_num);
+            }
+            else if (strcmp(method_str, "SetMute") == 0)
+            {
+                // 提取 parameters 的 Mute参数
+                cJSON *parameters = cJSON_GetObjectItem(method_json, "parameters");
+                cJSON *Mute = cJSON_GetObjectItem(parameters, "Mute");
+
+                if (cJSON_IsTrue(Mute))
+                {
+                    Int_ES8311_SetMute(true);
+                }
+                else
+                {
+                    Int_ES8311_SetMute(false);
+                }
+            }
+        }
+
     } // 表情回复
     else if (strcmp(type_str, "llm") == 0)
     {
@@ -176,13 +225,26 @@ void app_main(void)
         void *data = App_process_ReadFromEncoderData(audio_process, &len);
 
         // 把数据通过websocket客户端发送给服务器
-        Dri_websocket_SendOpusTOService(data, len);
+        Dri_websocket_SendOpusTOService(data, (int)len);
 
         // 释放资源
         free(data);
 
-        vTaskDelay(10);
+        // vTaskDelay(10);
     }
+
+    // void *data = NULL;
+    // while (1)
+    // {
+
+    //     // 从opus解码器的缓冲区读取数据
+    //     data = App_process_ReadFromEncoderData(audio_process, &len);
+
+    //     // Int_ES8311_ReadFromMic(data, 512);
+    //     App_process_WriteToDecoderData(audio_process,data, len);
+
+    //     vTaskDelay(10);
+    // }
 }
 
 // #include <stdio.h>

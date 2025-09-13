@@ -52,8 +52,16 @@ static void websocket_event_handler(void *handler_args, esp_event_base_t base, i
     case WEBSOCKET_EVENT_DATA: // 接收到数据
         // ESP_LOGI(TAG, "WEBSOCKET_EVENT_DATA");
         // ESP_LOGI(TAG, "Received opcode=%d", data->op_code);
+        if (data->op_code == 0x1)
+        { // 操作码0x1表示文本数据
+            if (text_cb != NULL)
+            {
+                // 回调函数
+                text_cb(data->data_ptr, data->data_len);
+            }
+        }
         // 操作码0x2表示二进制数据,即opus音频数据
-        if (data->op_code == 0x2)
+        else if (data->op_code == 0x2)
         {
             // ESP_LOG_BUFFER_HEX("Received binary data", data->data_ptr, data->data_len);
             if (bin_cb != NULL)
@@ -62,15 +70,6 @@ static void websocket_event_handler(void *handler_args, esp_event_base_t base, i
                 bin_cb(data->data_ptr, data->data_len);
             }
         }
-        else if (data->op_code == 0x1)
-        { // 操作码0x1表示文本数据
-            if (text_cb != NULL)
-            {
-                // 回调函数
-                text_cb(data->data_ptr, data->data_len);
-            }
-        }
-
         break;
     case WEBSOCKET_EVENT_ERROR:
         ESP_LOGI(TAG, "WEBSOCKET_EVENT_ERROR");
@@ -110,7 +109,7 @@ void Dri_websocket_Init(ws_text_cb cb1, ws_bin_cb cb2, ws_finish_cb cb3)
     // 配置WebSocket客户端
     esp_websocket_client_config_t websocket_cfg = {
         .uri = WS_URL,
-        .buffer_size = 2048,
+        .buffer_size = 4096,
         .transport = WEBSOCKET_TRANSPORT_OVER_SSL,
         .crt_bundle_attach = esp_crt_bundle_attach,
 
@@ -168,7 +167,7 @@ void Dri_websocket_SendHello(void)
     // 检查客户端是否创建成功且连接成功
     if (client != NULL && esp_websocket_client_is_connected(client))
     {
-        MY_LOGE("websocket Send Hello is OK...\r\n");
+        // MY_LOGE("websocket Send Hello is OK...\r\n");
 
         // 组装cJSON对象
         cJSON *root = cJSON_CreateObject();
@@ -177,10 +176,10 @@ void Dri_websocket_SendHello(void)
         cJSON_AddStringToObject(root, "transport", "websocket");
 
         cJSON *audio_params = cJSON_CreateObject();
-        cJSON_AddStringToObject(root, "format", "opus");
-        cJSON_AddNumberToObject(root, "sample_rate", 16000);
-        cJSON_AddNumberToObject(root, "channels", 1);
-        cJSON_AddNumberToObject(root, "frame_duration", 60);
+        cJSON_AddStringToObject(audio_params, "format", "opus");
+        cJSON_AddNumberToObject(audio_params, "sample_rate", 16000);
+        cJSON_AddNumberToObject(audio_params, "channels", 1);
+        cJSON_AddNumberToObject(audio_params, "frame_duration", 60);
         cJSON_AddItemToObject(root, "audio_params", audio_params);
 
         // 转换为cJSON字符串
@@ -189,12 +188,12 @@ void Dri_websocket_SendHello(void)
         // 发送文本消息
         esp_websocket_client_send_text(client, root_str, strlen(root_str), portMAX_DELAY);
 
+        xEventGroupWaitBits(ws_eventgroup, WS_HELLO_EVENT, true, true, portMAX_DELAY);
         // 释放资源
         cJSON_Delete(root);
         free(root_str);
 
         // 等待事件标志（等待接收到hello消息）
-        xEventGroupWaitBits(ws_eventgroup, WS_HELLO_EVENT, true, true, portMAX_DELAY);
     }
     else
     {
@@ -211,7 +210,7 @@ void Dri_websocket_SendWakeNet(void)
     // 检查客户端是否创建成功且连接成功
     if (client != NULL && esp_websocket_client_is_connected(client))
     {
-        MY_LOGE("websocket Send WakeNet is OK...\r\n");
+        // MY_LOGE("websocket Send WakeNet is OK...\r\n");
 
         // 组装cJSON对象
         cJSON *root = cJSON_CreateObject();
@@ -245,7 +244,7 @@ void Dri_websocket_SendStartListen(void)
     // 检查客户端是否创建成功且连接成功
     if (client != NULL && esp_websocket_client_is_connected(client))
     {
-        MY_LOGE("websocket Send start listen is OK...\r\n");
+        // MY_LOGE("websocket Send start listen is OK...\r\n");
 
         // 组装cJSON对象
         cJSON *root = cJSON_CreateObject();
@@ -257,6 +256,7 @@ void Dri_websocket_SendStartListen(void)
         // 转换为cJSON字符串
         char *root_str = cJSON_PrintUnformatted(root);
 
+        MY_LOGE("Send Listen:%.*s", strlen(root_str), root_str);
         // 发送文本消息
         esp_websocket_client_send_text(client, root_str, strlen(root_str), portMAX_DELAY);
 
@@ -279,7 +279,7 @@ void Dri_websocket_SendStopListen(void)
     // 检查客户端是否创建成功且连接成功
     if (client != NULL && esp_websocket_client_is_connected(client))
     {
-        MY_LOGE("websocket Send stop listen is OK...\r\n");
+        // MY_LOGE("websocket Send stop listen is OK...\r\n");
 
         // 组装cJSON对象
         cJSON *root = cJSON_CreateObject();
@@ -312,7 +312,7 @@ void Dri_websocket_SendAbort(void)
     // 检查客户端是否创建成功且连接成功
     if (client != NULL && esp_websocket_client_is_connected(client))
     {
-        MY_LOGE("websocket Send Abort is OK...\r\n");
+        // MY_LOGE("websocket Send Abort is OK...\r\n");
 
         // 组装cJSON对象
         cJSON *root = cJSON_CreateObject();
@@ -322,7 +322,7 @@ void Dri_websocket_SendAbort(void)
 
         // 转换为cJSON字符串
         char *root_str = cJSON_PrintUnformatted(root);
-
+        MY_LOGE("Send Abort:%.*s", strlen(root_str), root_str);
         // 发送文本消息
         esp_websocket_client_send_text(client, root_str, strlen(root_str), portMAX_DELAY);
 
@@ -348,5 +348,75 @@ void Dri_websocket_SendOpusTOService(void *data, int len)
     if (client != NULL && esp_websocket_client_is_connected(client))
     {
         esp_websocket_client_send_bin(client, (char *)data, len, portMAX_DELAY);
+    }
+    else
+    {
+        MY_LOGE("websocket SendOpusTOService is ERROR...\r\n");
+    }
+}
+
+/**
+ * @brief 发送需要AI控制的外设
+ *
+ */
+void Dri_websocket_Send_iot_dev(void)
+{
+    // 检查客户端是否创建成功且连接成功
+    if (client != NULL && esp_websocket_client_is_connected(client))
+    {
+        // MY_LOGE("websocket Send iot_dev is OK...\r\n");
+
+        // 组装cJSON字符串
+        char *data1 = "{\"descriptors\":[{\"description\":\"Speaker\",\"methods\":{\"SetMute\":{\"description\":\"Set mute status\",\"parameters\":{\"mute\":{\"description\":\"Mute status\",\"type\":\"boolean\"}}},\"SetVolume\":{\"description\":\"Set volume level\",\"parameters\":{\"volume\":{\"description\":\"Volume level[0-100]\",\"type\":\"number\"}}}},\"name\":\"Speaker\",\"properties\":{\"mute\":{\"description\":\"Mute status\",\"type\":\"boolean\"},\"volume\":{\"description\":\"Volume level[0-100]\",\"type\":\"number\"}}}],\"session_id\":\"";
+        char *data2 = "\",\"type\":\"iot\",\"update\":true}";
+        size_t data1_len = strlen(data1);
+        size_t data2_len = strlen(data2);
+        char *json_str = (char *)heap_caps_malloc(strlen(data1) + strlen(data2) + 8, MALLOC_CAP_SPIRAM);
+        memcpy(json_str, data1, data1_len);
+        memcpy(json_str + data1_len, session_id, 8);
+        memcpy(json_str + data1_len + 8, data2, data2_len);
+
+        // 发送文本消息
+        esp_websocket_client_send_text(client, json_str,  data1_len + data2_len + 8, portMAX_DELAY);
+
+        // 释放资源
+        free(json_str);
+    }
+    else
+    {
+        MY_LOGE("websocket Send iot_dev is ERROR...\r\n");
+    }
+}
+
+/**
+ * @brief 发送需要AI控制的外设当前的状态
+ *
+ */
+void Dri_websocket_Send_iot_dev_status(void)
+{
+    // 检查客户端是否创建成功且连接成功
+    if (client != NULL && esp_websocket_client_is_connected(client))
+    {
+        // MY_LOGE("websocket Send iot_dev_status is OK...\r\n");
+
+        // 组装cJSON字符串
+        char *data1 = "{\"session_id\": \"";
+        char *data2 = "\",\"states\": [{\"name\": \"Speaker\",\"state\": {\"mute\": false,\"volume\": 60}}],\"type\": \"iot\",\"update\": true}";
+        size_t data1_len = strlen(data1);
+        size_t data2_len = strlen(data2);
+        char *json_str = (char *)heap_caps_malloc(strlen(data1) + strlen(data2) + 8, MALLOC_CAP_SPIRAM);
+        memcpy(json_str, data1, data1_len);
+        memcpy(json_str + data1_len, session_id, 8);
+        memcpy(json_str + data1_len + 8, data2, data2_len);
+
+        // 发送文本消息
+        esp_websocket_client_send_text(client, json_str,  data1_len + data2_len + 8, portMAX_DELAY);
+
+        // 释放资源
+        free(json_str);
+    }
+    else
+    {
+        MY_LOGE("websocket Send iot_dev_status is ERROR...\r\n");
     }
 }

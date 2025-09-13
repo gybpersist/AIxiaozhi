@@ -28,10 +28,10 @@ audio_process_t *App_process_Creat(void)
     audio_process->audio_encoder = Int_encoder_Creat();
     audio_process->audio_decoder = Int_decoder_Creat();
     // 创建 缓冲区
-    audio_process->encoder_inputbuffer = xRingbufferCreateWithCaps(64 * 1024, RINGBUF_TYPE_BYTEBUF, MALLOC_CAP_SPIRAM);
-    audio_process->encoder_outputbuffer = xRingbufferCreateWithCaps(64 * 1024, RINGBUF_TYPE_NOSPLIT, MALLOC_CAP_SPIRAM);
-    audio_process->decoder_inputbuffer = xRingbufferCreateWithCaps(64 * 1024, RINGBUF_TYPE_NOSPLIT, MALLOC_CAP_SPIRAM);
-    audio_process->decoder_outputbuffer = xRingbufferCreateWithCaps(64 * 1024, RINGBUF_TYPE_NOSPLIT, MALLOC_CAP_SPIRAM);
+    audio_process->encoder_inputbuffer = xRingbufferCreateWithCaps(320 * 1024, RINGBUF_TYPE_BYTEBUF, MALLOC_CAP_SPIRAM);
+    audio_process->encoder_outputbuffer = xRingbufferCreateWithCaps(320 * 1024, RINGBUF_TYPE_NOSPLIT, MALLOC_CAP_SPIRAM);
+    audio_process->decoder_inputbuffer = xRingbufferCreateWithCaps(320 * 1024, RINGBUF_TYPE_NOSPLIT, MALLOC_CAP_SPIRAM);
+    audio_process->decoder_outputbuffer = xRingbufferCreateWithCaps(320 * 1024, RINGBUF_TYPE_NOSPLIT, MALLOC_CAP_SPIRAM);
     Int_SR_Set_OutputBuffer(audio_process->audio_sr,audio_process->encoder_inputbuffer);
     Int_encoder_Set_InputBuffer(audio_process->audio_encoder, audio_process->encoder_inputbuffer);
     Int_encoder_Set_OutputBuffer(audio_process->audio_encoder, audio_process->encoder_outputbuffer);
@@ -89,7 +89,7 @@ static void audio_process_task(void *args)
 void *App_process_ReadFromEncoderData(audio_process_t *audio_process, size_t *len)
 {
     assert(audio_process);
-    // 读取来自编码器输出缓冲区的数据 (不能直接返回[不能释放资源],需要先复制一个出来,再释放资源)
+    // 读取来自编码器输出缓冲区的数据
     void *read_data = xRingbufferReceive(audio_process->encoder_outputbuffer, len, portMAX_DELAY);
     void *data = heap_caps_malloc(*len, MALLOC_CAP_SPIRAM);
     memcpy(data, read_data, *len);

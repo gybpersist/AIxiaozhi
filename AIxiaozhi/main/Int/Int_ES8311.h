@@ -44,6 +44,20 @@ void Int_ES8311_ReadFromMic(void *data,int len);
  */
 void Int_ES8311_WriteToSpeak(void *data,int len);
 
+/**
+ * @brief 设置音量大小
+ * 
+ * @param Volume 要设置的音量
+ */
+void Int_ES8311_SetVolume(int Volume);
+
+/**
+ * @brief 设置静音
+ * 
+ * @param Mute true:静音  false:取消静音
+ */
+void Int_ES8311_SetMute(bool Mute);
+
 #endif /* __INT_ES8311_H__ */
 
 

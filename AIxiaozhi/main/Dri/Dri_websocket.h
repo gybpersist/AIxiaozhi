@@ -22,79 +22,91 @@
 #define WS_URL "wss://api.tenclass.net/xiaozhi/v1/"
 #define ACCESS_TOKEN "test-token"
 
-// ¶¨Òå ½ÓÊÕµ½ÎÄ±¾Êı¾İºóµÄ»Øµ÷º¯Êı
+// å®šä¹‰ æ¥æ”¶åˆ°æ–‡æœ¬æ•°æ®åçš„å›è°ƒå‡½æ•°
 typedef void (*ws_text_cb)(const char *, int);
-// ¶¨Òå ½ÓÊÕµ½¶ş½øÖÆÊı¾İºóµÄ»Øµ÷º¯Êı
+// å®šä¹‰ æ¥æ”¶åˆ°äºŒè¿›åˆ¶æ•°æ®åçš„å›è°ƒå‡½æ•°
 typedef void (*ws_bin_cb)(const char *, int);
-// ¶¨Òå ½áÊøµÄ»Øµ÷º¯Êı
+// å®šä¹‰ ç»“æŸçš„å›è°ƒå‡½æ•°
 typedef void (*ws_finish_cb)(void);
 
-// ´´½¨ÊÂ¼ş±êÖ¾×é
+// åˆ›å»ºäº‹ä»¶æ ‡å¿—ç»„
 extern EventGroupHandle_t ws_eventgroup;
-// websocket¿Í»§¶ËÁ¬½Ó³É¹¦µÄÊÂ¼ş±êÖ¾
+// websocketå®¢æˆ·ç«¯è¿æ¥æˆåŠŸçš„äº‹ä»¶æ ‡å¿—
 #define WS_CONNECTED_EVENT (1 << 1)
-// ½ÓÊÕµ½HELLOÏûÏ¢µÄÊÂ¼ş±êÖ¾
+// æ¥æ”¶åˆ°HELLOæ¶ˆæ¯çš„äº‹ä»¶æ ‡å¿—
 #define WS_HELLO_EVENT (1 << 2)
 
-// ¶¨Òåsession_id
+// å®šä¹‰session_id
 extern char session_id[9];
 
 /**
- * @brief ³õÊ¼»¯ websocket¿Í»§¶Ë
+ * @brief åˆå§‹åŒ– websocketå®¢æˆ·ç«¯
  *
- * @param cb1 ½ÓÊÕµ½ÎÄ±¾Êı¾İºóµÄ»Øµ÷º¯Êı
- * @param cb2 ½ÓÊÕµ½¶ş½øÖÆÊı¾İºóµÄ»Øµ÷º¯Êı
+ * @param cb1 æ¥æ”¶åˆ°æ–‡æœ¬æ•°æ®åçš„å›è°ƒå‡½æ•°
+ * @param cb2 æ¥æ”¶åˆ°äºŒè¿›åˆ¶æ•°æ®åçš„å›è°ƒå‡½æ•°
  */
-void Dri_websocket_Init(ws_text_cb cb1, ws_bin_cb cb2,ws_finish_cb cb3);
+void Dri_websocket_Init(ws_text_cb cb1, ws_bin_cb cb2, ws_finish_cb cb3);
 
 /**
- * @brief ¿ªÆô websocket¿Í»§¶Ë
+ * @brief å¼€å¯ websocketå®¢æˆ·ç«¯
  *
  */
 void Dri_websocket_Start(void);
 
 /**
- * @brief ¹Ø±Õ websocket¿Í»§¶Ë
+ * @brief å…³é—­ websocketå®¢æˆ·ç«¯
  *
  */
 void Dri_websocket_Close(void);
 
 /**
- * @brief ·¢ËÍ hello ÏûÏ¢
+ * @brief å‘é€ hello æ¶ˆæ¯
  *
  */
 void Dri_websocket_SendHello(void);
 
 /**
- * @brief ·¢ËÍ »½ĞÑ´Ê
- * 
+ * @brief å‘é€ å”¤é†’è¯
+ *
  */
 void Dri_websocket_SendWakeNet(void);
 
 /**
- * @brief ¿ªÊ¼ ¼àÌıĞÅÏ¢
- * 
+ * @brief å¼€å§‹ ç›‘å¬ä¿¡æ¯
+ *
  */
 void Dri_websocket_SendStartListen(void);
 
 /**
- * @brief Í£Ö¹ ¼àÌıĞÅÏ¢
- * 
+ * @brief åœæ­¢ ç›‘å¬ä¿¡æ¯
+ *
  */
 void Dri_websocket_SendStopListen(void);
 
 /**
- * @brief ·¢ËÍ ´ò¶ÏÇëÇó
- * 
+ * @brief å‘é€ æ‰“æ–­è¯·æ±‚
+ *
  */
 void Dri_websocket_SendAbort(void);
 
 /**
- * @brief ·¢ËÍ OpusÓïÒôµ½·şÎñÆ÷
- * 
- * @param data  OpusÓïÒôÊı¾İ
- * @param len Êı¾İ³¤¶È
+ * @brief å‘é€ Opusè¯­éŸ³åˆ°æœåŠ¡å™¨
+ *
+ * @param data  Opusè¯­éŸ³æ•°æ®
+ * @param len æ•°æ®é•¿åº¦
  */
 void Dri_websocket_SendOpusTOService(void *data, int len);
+
+/**
+ * @brief å‘é€éœ€è¦AIæ§åˆ¶çš„å¤–è®¾
+ *
+ */
+void Dri_websocket_Send_iot_dev(void);
+
+/**
+ * @brief å‘é€éœ€è¦AIæ§åˆ¶çš„å¤–è®¾å½“å‰çš„çŠ¶æ€
+ *
+ */
+void Dri_websocket_Send_iot_dev_status(void);
 
 #endif /* __DRI_WEBSOCKET_H__ */

@@ -168,3 +168,27 @@ void Int_ES8311_WriteToSpeak(void *data, int len)
         esp_codec_dev_write(codec_dev, data, len);
     }
 }
+
+/**
+ * @brief 设置音量大小
+ *
+ * @param Volume 要设置的音量
+ */
+void Int_ES8311_SetVolume(int Volume)
+{
+    MY_LOGE("设置音量为 %d", Volume);
+    // 设置输出音量
+    esp_codec_dev_set_out_vol(codec_dev, Volume);
+}
+
+/**
+ * @brief 设置静音
+ *
+ * @param Mute true:静音  false:取消静音
+ */
+void Int_ES8311_SetMute(bool Mute)
+{
+    MY_LOGE("设置静音状态为 %d", Mute);
+    // 设置编解码器输入静音参数
+    esp_codec_dev_set_in_mute(codec_dev,Mute);
+}
