@@ -1,0 +1,26 @@
+idf_component_register(
+    SRCS 
+        "main.c"
+        "Int/Int_ES8311.c"
+        "Int/Int_SR.c"
+        "Int/Int_encoder.c"
+        "Int/Int_decoder.c"
+        "Int/Int_lcd.c"
+        "Int/Int_ws2812.c"
+        "Com/Com_Debug.c"
+        "Com/Com_Util.c"
+        "Com/Com_status.c"
+        "Dri/Dri_WIFI.c"
+        "Dri/Dri_nvs.c"
+        "Dri/Dri_http.c"
+        "Dri/Dri_websocket.c"
+        "App/App_audio.c"
+        "App/App_display.c"
+
+    INCLUDE_DIRS 
+        "."
+        "App"
+        "Int"
+        "Com"
+        "Dri"
+)
